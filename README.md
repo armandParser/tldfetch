@@ -2,18 +2,25 @@
 
 A canvas-based API testing tool where you create visual flows using blocks and arrows to construct and execute API requests. Think tldraw meets Postman, but more intuitive and visual.
 
-## Features
+## ✨ Key Features
 
-- **Visual Block System**: Create API requests by dragging and connecting blocks
-- **Three Block Types**:
-  - **Base URL Block** (blue): Your API's base URL (e.g., `https://api.example.com`)
-  - **Resource Block** (pink): API endpoints and path segments (e.g., `users`, `posts`)
-  - **Method Block** (color-coded): HTTP methods (GET, POST, PUT, DELETE, PATCH)
-- **Arrow Connections**: Connect blocks to build your API path
-- **Live URL Preview**: See your constructed URL in real-time (bottom-left)
-- **Request Panel**: Configure headers and request body (right panel)
-- **Response Viewer**: View response data with tabs for body, headers, and raw data (bottom-right)
+### Visual Block System
+- **Base URL Block** (blue): Your API's base URL (e.g., `http://localhost:3000`)
+- **Resource Block** (pink): API endpoints and path segments (e.g., `users`, `posts`)
+- **Method Block** (color-coded): HTTP methods (GET, POST, PUT, DELETE, PATCH)
+
+### Smart Workflow
+- **Arrow Connections**: Connect blocks to build your API path visually
+- **Live URL Preview**: See your constructed URL in real-time
+- **Request Configuration**: Configure headers and request body with ease
+- **Response Viewer**: View response data with tabs for body, headers, and raw data
 - **Parameter Support**: Use `{variableName}` in resource blocks for dynamic parameters
+
+### Persistence & Convenience
+- **🔄 Auto-Save**: All your work is automatically saved to browser storage (IndexedDB)
+- **📦 Default Starter State**: New projects start with helpful example endpoints
+- **🗑️ Erase All**: Reset to default state with one click
+- **📜 Request History**: Track your recent API calls with expandable history panel
 
 ## Getting Started
 
@@ -39,70 +46,98 @@ npm run build
 
 ## How to Use
 
-### 1. Create Blocks
+### Your First Request (Using Default State)
 
-Use the toolbar on the left to add blocks to the canvas:
-- Click "Base URL" to add a base URL block
-- Click "Resource" to add a resource/endpoint block
-- Click a method (GET, POST, etc.) to add a method block
+When you first open TLDFetch, you'll see example endpoints already set up:
+- `http://localhost:3000` → `/health` → GET
+- `http://localhost:3000` → `/auth/login` → POST (with email/password fields)
 
-### 2. Connect Blocks with Arrows
+1. Click on the GET method block connected to `/health`
+2. Click "Send Request" in the right panel
+3. View the response in the bottom-right panel
 
-- Click and drag from a block's connection point (the circular handles)
-- Release on another block to create a connection
-- The path flows from Base URL → Resources → Method
+### Creating Custom Blocks
+
+Use the toolbar at the top-left to add blocks:
+- **Base URL**: Click to add a base URL block
+- **Resource**: Click to add a resource/endpoint block  
+- **GET/POST/PUT/DELETE/PATCH**: Click to add a method block
+
+### Connecting Blocks
+
+1. Click and drag from a block's connection point (circular handles)
+2. Release on another block to create a connection
+3. The path flows: Base URL → Resources → Method
 
 Example flow:
 ```
-[Base URL: https://api.github.com] → [Resource: users] → [Resource: octocat] → [GET]
+[Base URL: https://api.github.com] → [users] → [octocat] → [GET]
 ```
+Result: `https://api.github.com/users/octocat`
 
-This creates the URL: `https://api.github.com/users/octocat`
+### Editing Blocks
 
-### 3. Edit Block Values
+- **Double-click** any block to edit its value
+- **Base URL**: Enter the full base URL with protocol
+- **Resources**: Enter the path segment (or use `{param}` for dynamic values)
+- **Methods**: Cannot be edited (fixed values)
 
-- Double-click any block to edit its value
-- For Base URL: Enter the full base URL with protocol
-- For Resources: Enter the path segment (or use `{param}` for dynamic values)
-- Methods are fixed and cannot be edited
+### Using Parameters
 
-### 4. Using Parameters
-
-To create dynamic URLs with parameters:
+Create dynamic URLs with parameters:
 1. Create a resource block
 2. Double-click to edit it
 3. Enter a value with curly braces: `{userId}`
-4. The block will change color to orange, indicating it's a parameter
+4. The block will turn orange, indicating it's a parameter
 
-### 5. Send Requests
+### Sending Requests
 
 Once you have a valid path (Base URL → Resources → Method):
-1. The Active URL display (bottom-left) will show your constructed URL
-2. A Request Panel will appear on the right
-3. Configure headers if needed (default: `Content-Type: application/json`)
-4. Add a request body for POST/PUT/PATCH requests
+1. The Active URL display will show your constructed URL
+2. A Request Panel appears with configuration options
+3. Add headers if needed (default: `Content-Type: application/json`)
+4. Add request body for POST/PUT/PATCH (use key-value fields or JSON)
 5. Click "Send Request"
 6. View the response in the bottom-right panel
 
-### 6. View Responses
+### Drag & Drop Response Values
 
-The Response Modal shows:
-- Status code (color-coded: green=success, red=error)
-- Response time in milliseconds
-- Response size
-- Three tabs:
-  - **Body**: Formatted JSON
-  - **Headers**: Response headers as key-value pairs
-  - **Raw**: Raw response text
+Extract values from API responses and use them in subsequent requests:
+1. Send a request (e.g., login to get a token)
+2. In the response viewer, **drag** any field from the JSON response
+3. **Drop** it onto any request field (headers, body fields, or URL parameters)
+4. Perfect for workflows like: login → get token → use token in authenticated requests
+
+**Example workflow:**
+- Login via `/auth/login` POST → get `token` from response
+- Drag the `token` value from response
+- Drop it onto the Authorization header of your next request
+
+
+### Request History
+
+- All successful requests are saved to your history
+- View history in the collapsible panel above the response viewer
+- Click any history item to expand and see the full response
+- Delete individual items with the ❌ button
+
+### Erase All
+
+Click the red "Erase All" button in the toolbar to:
+- Clear all blocks and connections
+- Reset to the default starter state
+- Start fresh with example endpoints
 
 ## Tech Stack
 
-- **React** + **TypeScript**: UI framework
+- **React 19** + **TypeScript**: UI framework
 - **React Flow**: Canvas and node-based graph system
 - **Zustand**: State management
-- **Tailwind CSS**: Styling
+- **IndexedDB**: Client-side persistence
+- **Tailwind CSS v4**: Styling
 - **Axios**: HTTP client
 - **Vite**: Build tool
+- **Lucide React**: Icons
 
 ## Project Structure
 
@@ -110,21 +145,25 @@ The Response Modal shows:
 src/
 ├── components/
 │   ├── Blocks/
-│   │   ├── BaseUrlBlock.tsx    # Blue base URL block
-│   │   ├── ResourceBlock.tsx   # Pink resource/parameter block
-│   │   └── MethodBlock.tsx     # Color-coded HTTP method block
+│   │   ├── BaseUrlBlock.tsx       # Blue base URL block
+│   │   ├── ResourceBlock.tsx      # Pink resource/parameter block
+│   │   ├── MethodBlock.tsx        # Color-coded HTTP method block
+│   │   └── RequestNode.tsx        # Request configuration node
 │   ├── Canvas/
-│   │   └── Canvas.tsx          # Main React Flow canvas
+│   │   └── Canvas.tsx             # Main React Flow canvas
 │   ├── Panels/
-│   │   ├── ActiveUrlDisplay.tsx    # Bottom-left URL display
-│   │   ├── RequestPanel.tsx        # Right-side request config
-│   │   └── ResponseModal.tsx       # Bottom-right response viewer
+│   │   ├── ResponseModal.tsx      # Response viewer
+│   │   └── ResponseHistory.tsx    # Request history panel
+│   ├── Modals/
+│   │   └── RequestBodyHistoryModal.tsx  # Body history dropdown
 │   └── Toolbar/
-│       └── BlockToolbar.tsx    # Left toolbar for adding blocks
+│       └── BlockToolbar.tsx       # Top toolbar for adding blocks
 ├── store/
-│   └── useCanvasStore.ts       # Zustand store for state management
-├── types.ts                    # TypeScript type definitions
-└── App.tsx                     # Main app component
+│   ├── useCanvasStore.ts          # Zustand store for state management
+│   └── indexedDB.ts               # IndexedDB persistence utilities
+├── types.ts                       # TypeScript type definitions
+├── App.tsx                        # Main app component
+└── main.tsx                       # Entry point with hydration
 ```
 
 ## Keyboard Shortcuts
@@ -138,61 +177,91 @@ src/
 
 ### Simple GET Request
 
-1. Add Base URL block: `https://jsonplaceholder.typicode.com`
-2. Add Resource block: `posts`
-3. Add GET block
+1. Add Base URL: `https://jsonplaceholder.typicode.com`
+2. Add Resource: `posts`
+3. Add GET method
 4. Connect: Base URL → posts → GET
 5. Click "Send Request"
 
 ### POST Request with Body
 
-1. Add Base URL block: `https://jsonplaceholder.typicode.com`
-2. Add Resource block: `posts`
-3. Add POST block
+1. Add Base URL: `https://jsonplaceholder.typicode.com`
+2. Add Resource: `posts`
+3. Add POST method
 4. Connect: Base URL → posts → POST
-5. In the Request Panel, add body:
-```json
-{
-  "title": "foo",
-  "body": "bar",
-  "userId": 1
-}
-```
+5. In the Request Panel, add body fields:
+   - `title`: `foo`
+   - `body`: `bar`
+   - `userId`: `1`
 6. Click "Send Request"
 
 ### Dynamic Parameter Request
 
-1. Add Base URL block: `https://jsonplaceholder.typicode.com`
-2. Add Resource block: `posts`
-3. Add Resource block: `{postId}` (will turn orange)
-4. Add GET block
+1. Add Base URL: `https://jsonplaceholder.typicode.com`
+2. Add Resource: `posts`
+3. Add Resource: `{postId}` (will turn orange)
+4. Add GET method
 5. Connect: Base URL → posts → {postId} → GET
-6. Click "Send Request"
+6. Enter a value for `postId` when prompted
+7. Click "Send Request"
 
-## Roadmap
+## Features Status
 
-See the TODO.md file for the complete roadmap and planned features.
-
-### MVP Status (Complete!)
+### ✅ Implemented
 
 - [x] Canvas with pan/zoom
 - [x] Three block types (BaseURL, Resource, Method)
 - [x] Arrow connections
 - [x] Path computation and display
 - [x] Request execution (all HTTP methods)
-- [x] Response display with tabs
+- [x] Response display with tabs (Body, Headers, Raw)
+- [x] Request history with persistence
+- [x] Body history for endpoints
+- [x] IndexedDB persistence (auto-save)
+- [x] Default starter state
+- [x] Erase all functionality
+- [x] Parameter support with variable input
+- [x] Request/Response panels
 
-### Future Enhancements
+### 🚧 Future Enhancements
 
 - [ ] Variable extraction from responses
 - [ ] Environment switching (Dev/Staging/Prod)
 - [ ] Collections/Workspaces
-- [ ] Request history
-- [ ] Save/Load canvas to JSON
+- [ ] Export canvas to JSON
+- [ ] Import saved canvases
 - [ ] Export as curl/code snippet
 - [ ] Response assertions/testing
-- [ ] Auth block (JWT, Bearer tokens)
+- [ ] WebSocket support
+- [ ] GraphQL support
+
+## Browser Compatibility
+
+Requires a modern browser with:
+- IndexedDB support
+- ES2020+ JavaScript features
+- CSS Grid and Flexbox
+
+Tested on:
+- Chrome
+- Safari
 
 ## License
 
-MIT
+**CC BY-NC 4.0** (Creative Commons Attribution-NonCommercial 4.0 International)
+
+This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License.
+
+You are free to:
+- **Share** — copy and redistribute the material in any medium or format
+- **Adapt** — remix, transform, and build upon the material
+
+Under the following terms:
+- **Attribution** — You must give appropriate credit, provide a link to the license, and indicate if changes were made
+- **NonCommercial** — You may not use the material for commercial purposes
+
+For commercial licensing inquiries, please contact the project maintainer.
+
+Full license: https://creativecommons.org/licenses/by-nc/4.0/
+
+---
