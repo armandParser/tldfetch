@@ -3,6 +3,7 @@ import { addEdge, applyNodeChanges, applyEdgeChanges, type Connection, type Node
 import { nanoid } from 'nanoid';
 import type { CanvasState, ApiBlock, BlockType, HttpMethod, RequestState, ResponseState, BodyField, HeaderField, HistoryItem, RequestBodyHistoryItem } from '../types';
 import { saveState, loadState } from './indexedDB';
+import { importOpenAPI, parseOpenAPIJson, validateOpenAPISpec, type ImportResult } from '../utils/openApiImporter';
 
 // Helper function to compute the active path nodes
 function computeActivePathNodes(
@@ -76,6 +77,9 @@ interface CanvasStore extends CanvasState {
 
   // Reset
   resetToDefault: () => void;
+
+  // Import
+  importFromOpenAPI: (jsonString: string) => ImportResult;
 }
 
 // Create default starter nodes and edges
@@ -379,7 +383,7 @@ export const useCanvasStore = create<CanvasStore>((set, get) => ({
 
         const isParam = /\{(.+)\}/.test(value);
         if (isParam) {
-          value = value.replace(/\{(\w+)\}/g, (_, key) => {
+          value = value.replace(/\{([\w-]+)\}/g, (_, key) => {
             return variables[key] || `{${key}}`;
           });
         }
@@ -500,6 +504,31 @@ export const useCanvasStore = create<CanvasStore>((set, get) => ({
     set(newState);
     // Save the default state to IndexedDB
     debouncedSave();
+  },
+
+  importFromOpenAPI: (jsonString: string) => {
+    const spec = parseOpenAPIJson(jsonString);
+
+    if (!validateOpenAPISpec(spec)) {
+      throw new Error('Invalid OpenAPI specification');
+    }
+
+    const result = importOpenAPI(spec);
+
+    set(() => {
+      // Merge imported nodes/edges with existing ones, or replace entirely
+      // For now, we replace entirely for a clean import
+      const newState = {
+        nodes: result.nodes,
+        edges: result.edges,
+        activePathId: null,
+        activePathNodes: [],
+      };
+      debouncedSave();
+      return newState;
+    });
+
+    return result;
   },
 }));
 
