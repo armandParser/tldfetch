@@ -22,6 +22,11 @@ A canvas-based API testing tool where you create visual flows using blocks and a
 - **🗑️ Erase All**: Reset to default state with one click
 - **📜 Request History**: Track your recent API calls with expandable history panel
 
+### Import & Export
+- **📥 OpenAPI Import**: Import API schemas from OpenAPI/Swagger files (JSON & YAML supported)
+- Automatically creates visual blocks and connections from your API specification
+- Extracts request body fields from schemas
+
 ## Getting Started
 
 ### Installation
@@ -222,6 +227,7 @@ src/
 - [x] Erase all functionality
 - [x] Parameter support with variable input
 - [x] Request/Response panels
+- [x] OpenAPI/Swagger import (JSON & YAML)
 
 ### 🚧 Future Enhancements
 
